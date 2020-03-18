@@ -6,7 +6,12 @@
 
 #onLoad{
     background-color: orange;
-    
+}
+#onload-msg{
+    background-color: skyblue;
+    height: 60px;
+    text-align: center;
+    margin-left: 200px;
 }
 .appTitle{
     background-color: orange;
