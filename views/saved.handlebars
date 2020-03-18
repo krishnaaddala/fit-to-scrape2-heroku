@@ -1,0 +1,51 @@
+{{#unless quotes}}
+<div id='onload-msg'>
+    <h2>No Saved Quotes!!!</h2>
+</div>
+{{/unless}}
+<!-- Pass in data from server.js -->
+<ul class="list">
+    {{#each quotes}}
+    <li class="quotesList">
+        <p><span class="label">Quote:</span> {{quote}}</p>
+        <p><span class="label">Author:</span> {{author}}</p>
+        <button class="btn btn-primary createNote" id="createMyNote">Quote Notes</button>
+        <div class="modal" id="modalNote" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Quote Notes</h5>
+
+                    </div>
+                    <div class="modal-body noteModal">
+
+                        {{#each this.note}}
+                        <div>
+                            <p>{{this.body}}</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {{/each}}
+
+                        <form>
+                            <label for="noteBody">Add a Note</label>
+                            <br>
+                            <textarea id="noteBody">
+
+                            </textarea>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-id="{{_id}}" id="saveThisNote">Save
+                            Note</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button data-id="{{quote}}" id="delete-quote" class="delete-comment-btn btn btn-danger btn-sml">Delete
+            Quote</button>
+    </li>
+    {{/each}}
+</ul>
