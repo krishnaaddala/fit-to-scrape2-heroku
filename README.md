@@ -27,96 +27,115 @@ Chrome browser
 
 ## Screenshots of homework progress
 
-![Code progression Final](https://github.com/krishnaaddala/FriendFinder/blob/master/Images/FinalCode_1.png "Final code1")
+![Code progression Final](https://github.com/krishnaaddala/fit-to-scrape2-heroku/blob/master/public/assets/Images/Final-Image-1.png "Final code1")
 
-![Code progression Final](https://github.com/krishnaaddala/FriendFinder/blob/master/Images/FinalCode2.png "Final Code2")
+![Code progression Final](https://github.com/krishnaaddala/fit-to-scrape2-heroku/blob/master/public/assets/Images/Final-Image-2.png "Final Code2")
 
 
 ## Gif walkthrough
 
-![Giphy](https://github.com/krishnaaddala/FriendFinder/blob/master/Images/FinalGiphy.gif)
+![Giphy](https://github.com/krishnaaddala/fit-to-scrape2-heroku/blob/master/public/assets/Images/final-demo.gif)
 
 
 ## Code Snippets
-##### Example of friends data used:
-```{
-        name: "Tom Hardy",
-        photo:
-          "https://m.media-amazon.com/images/M/MV5BMTQ3ODEyNjA4Nl5BMl5BanBnXkFtZTgwMTE4ODMyMjE@._V1_SY1000_CR0,0,666,1000_AL_.jpg",
-        scores: [5, 1, 4, 4, 5, 1, 2, 5, 4, 4]
-      },
-      {
-        name: "Jamie Dornan",
-        photo:
-          "https://www.usmagazine.com/wp-content/uploads/2018/02/jamie-dornan-nude.jpg",
-        scores: [4, 2, 5, 1, 3, 2, 2, 1, 3, 2]
-      },
-  ```
-
-  ```app.get("/survey", function(req, res) {
-    res.sendFile(path.join(__dirname, "../public/survey.html"));
-  });
-
-  // If no matching route is found default to home
-  app.get("*", function(req, res) {
-    res.sendFile(path.join(__dirname, "../public/home.html"));
-  });
-};
-  ```
-
-  ``` var friendsData = require("../data/friends.js");
-
-module.exports = function(app) {
-
-  app.get("/api/friends", function(req, res) {
-    res.json(friendsData);
-  });
-  ```
-  ```$("#submit").on("click", function (event) {
-                event.preventDefault();
-
-                // Here we grab the form elements
-                var userData = {
-                    userName: $("#enterName").val().trim(),
-                    images: $("#userImage").val().trim(),
-                    choices: [
-                        $("#q1").val(),
-                        $("#q2").val(),
-                        $("#q3").val(),
-                        $("#q4").val(),
-                        $("#q5").val(),
-                        $("#q6").val(),
-                        $("#q7").val(),
-                        $("#q8").val(),
-                        $("#q9").val(),
-                        $("#q10").val()
-                    ]
-                };
-  ```
-  ```    for (f of friendsData) {
-        var fScore = 0;
-        for(var i = 0; i < 10; i++) {
-            var c = 0;
-            if(choices[i].length !== 0) {
-                c = choices[i];
-            }
-            absDiff = Math.abs(f.scores[i] - c);
-            fScore += absDiff;
-        }
-        scores.push(fScore);
-    }
-    var friendIndex = scores.indexOf(Math.min.apply(Math, scores));
-    var match = friendsData[friendIndex];
-    console.log(friendsData[friendIndex]);
-  ```
-  ``` $.post("/api/friends", userData, function (data) {
-                    console.log(data);
-                    $("#modal-text").text(data.name);
-                    $("#modal-photo").attr("src", data.photo);
-                    $("#modal-photo").width(300);
-                    $("#modal-photo").height(250);
-                    $("#newModal").modal("show");
+##### Example of HTML routes:
+```//html routes
+app.get("/", (req, res) => {
+    console.log("in the / route");
+    db.Quote.find()
+        .populate("quotes")
+        .lean()
+        .then(function (dbQuotes) {
+            console.log("***********************")
+            console.log(dbQuotes)
+            res.render("home",
+                {
+                    quotes: dbQuotes
                 });
+        })
+});
+  ```
+
+  ```//API Routes
+
+app.get("/scrape", function (req, res) {
+    var query = {}
+    db.Quote.deleteMany(query, function (err, obj) {
+        if (err) throw err;
+    });
+    axios.get("http://quotes.toscrape.com/").then(function (response) {
+        var $ = cheerio.load(response.data);
+        $("div.quote").each(function (i, element) {
+            var result = {};
+            result.quote = $(this)
+                .children("span.text")
+                .text();
+            result.author = $(this)
+                .children("span")
+                .children("small.author")
+                .text();
+            db.Quote.create(result)
+                .then(function (dbQuote) {
+                })
+                .catch(function (err) {
+                    console.log(err)
+                });
+        });
+        res.redirect("/");
+    });
+});
+  ```
+
+  ``` $.ajax({
+      method: "GET",
+      url: "/quotes/" + thisId
+    })
+      // With that done, add the note information to the page
+      .then(function(data) {
+        console.log(data);
+        // The title of the article
+        $("#notes").append("<h2>" + data.title + "</h2>");
+        // An input to enter a new title
+        $("#notes").append("<input id='titleinput' name='title' >");
+        // A textarea to add a new note body
+        $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
+        // A button to submit a new note, with the id of the article saved to it
+        $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
+  
+        // If there's a note in the article
+        if (data.note) {
+          // Place the title of the note in the title input
+          $("#titleinput").val(data.note.title);
+          // Place the body of the note in the body textarea
+          $("#bodyinput").val(data.note.body);
+        }
+      });
+  });
+  ```
+  ``` {{#unless quotes}}
+    <div id='onload-msg'>
+      <h2>Uh-Oh Looks like we don't have any new quotes.</h2>
+    </div>
+    {{/unless}}
+    <!-- Pass in data from server.js -->
+    <ul class="list">
+      {{#each quotes}}
+      <li class="quotesList">
+        <p><span class="label">Quote:</span> {{quote}}</p>
+        <p><span class="label">Author:</span> {{author}}</p>
+        <button data-id="{{quote}}" class="saveQuote" id="saveMyQuote">Save Article</button>
+  ```
+  ```    {{#unless quotes}}
+<div id='onload-msg'>
+    <h2>No Saved Quotes!!!</h2>
+</div>
+{{/unless}}
+  ```
+  ``` {{#each quotes}}
+    <li class="quotesList">
+        <p><span class="label">Quote:</span> {{quote}}</p>
+        <p><span class="label">Author:</span> {{author}}</p>
+        <button class="btn btn-primary createNote" id="createMyNote">Quote Notes</button>
   ```
 Git commands:
 
