@@ -5,10 +5,10 @@ $(document).on("load", function(){
 $('#showModal').click(function(){
     // show Modal
     $.get('/scrape').done(function(data) {
-                $(".myModal").modal('show');
+      $(".myModal").modal('show');
     });
-    
-});
+    // location.reload();
+  });
 // });
   // Whenever someone clicks a p tag
   $(document).on("click", "p", function() {
@@ -98,7 +98,7 @@ $('#showModal').click(function(){
   $(document).on("click", "#saveThisNote", function() {
     // Grab the id associated with the article from the submit button
     var thisId = $(this).attr("data-id");
-    var noteBody = $("#noteBody").val()
+    var noteBody = $("#noteBody").val().replace(/\n|\r/g, "").trim()
     console.log(noteBody)
     console.log("id"+thisId);
     // Run a POST request to change the note, using what's entered in the inputs
@@ -108,7 +108,7 @@ $('#showModal').click(function(){
       url: "/quotes/add-note/" + thisId,
       data: {
         // Value taken from note textarea
-        body: $("#noteBody").val(),
+        body: noteBody,
         quoteId: thisId
       }
 
@@ -117,13 +117,29 @@ $('#showModal').click(function(){
       .then(function(data) {
         // Log the response
         console.log(data);
-        // window.location.reload();     
+        window.location.reload();     
         // Empty the notes section
-        // $("#notes").empty();
+        $("#notes").empty();
       });
   
     // Also, remove the values entered in the input and textarea for note entry
     $("#titleinput").val("");
     $("#bodyinput").val("");
+  });
+
+  $(document).on("click", "#deleteNote", function() {
+    // Grab the id associated with the article from the submit button
+    var thisId = $(this).attr("data-id");
+  
+    // Run a POST request to save the quote, using what's entered in the inputs
+    $.ajax({
+      method: "DELETE",
+      url: "/notes/" + thisId
+    })
+      // With that done
+      .then(function(data) {
+        // Log the response
+        window.location.reload();     
+     });
   });
   

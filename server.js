@@ -32,7 +32,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true }, (err) => {
 //html routes
 app.get("/", (req, res) => {
     console.log("in the / route");
-    db.Quote.find()
+    db.Quote.find({isSaved : false})
         .populate("quotes")
         .lean()
         .then(function (dbQuotes) {
@@ -46,9 +46,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/saved", (req, res) => {
-    console.log("in the / route");
+    console.log("in the /saved route");
     db.Quote.find({ isSaved: true })
-        //.populate("note")
+        .populate("note")
         .lean()
         .then(function (dbQuotes) {
             console.log("***********************")
@@ -123,7 +123,12 @@ app.delete("/quotes/:id", function (req, res) {
 });
 
 app.post("/quotes/add-note/:quoteId", function (req, res) {
+    console.log("REQ ::" + req.body);
     db.Note.create(req.body)
+        .then(function (dbNote) {
+            return db.Quote.findOneAndUpdate({ _id: req.params.quoteId }, { note: dbNote._id }, { new: true });
+            // res.json(dbQuote);
+        })
         .then(function (dbQuote) {
             res.json(dbQuote);
         })
