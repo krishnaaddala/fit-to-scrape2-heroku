@@ -23,7 +23,7 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 
 app.set("view engine", "handlebars");
 
-const MONGODB_URI = process.env.MONGOLAB_BLUE_URI || "mongodb://localhost/quoteScraped";
+const MONGODB_URI = process.env.mongoDBUNPD || "mongodb://localhost/quoteScraped";
 // Connect to the Mongo DB
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true }, (err) => {
     if (err) throw err;
